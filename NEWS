@@ -95,6 +95,12 @@ PHP                                                                        NEWS
   . Fixed bug 71162 (updateTimestamp never called when session data is empty).
     (Girgias)
 
+- SNMP:
+  . Added "SHA224" and "SHA384" auth protocol support for SNMPv3 when
+    linked against net-snmp >= 5.8 (RFC 7860). (thomasvincent)
+  . Added "AES192" and "AES256" privacy protocol support for SNMPv3 when
+    linked against net-snmp with Blumenthal AES support. (thomasvincent)
+
 - Soap:
   . Soap::__setCookie() when cookie name is a digit is now not stored and
     represented as a string anymore but a int. (David Carlier)

@@ -1021,10 +1021,26 @@ static bool snmp_session_set_auth_protocol(struct snmp_session *s, zend_string *
 		return true;
 	}
 
+#ifdef HAVE_SNMP_SHA224
+	if (zend_string_equals_literal_ci(prot, "SHA224")) {
+		s->securityAuthProto = usmHMAC128SHA224AuthProtocol;
+		s->securityAuthProtoLen = sizeof(usmHMAC128SHA224AuthProtocol) / sizeof(oid);
+		return true;
+	}
+#endif
+
 #ifdef HAVE_SNMP_SHA256
 	if (zend_string_equals_literal_ci(prot, "SHA256")) {
 		s->securityAuthProto = usmHMAC192SHA256AuthProtocol;
 		s->securityAuthProtoLen = sizeof(usmHMAC192SHA256AuthProtocol) / sizeof(oid);
+		return true;
+	}
+#endif
+
+#ifdef HAVE_SNMP_SHA384
+	if (zend_string_equals_literal_ci(prot, "SHA384")) {
+		s->securityAuthProto = usmHMAC256SHA384AuthProtocol;
+		s->securityAuthProtoLen = sizeof(usmHMAC256SHA384AuthProtocol) / sizeof(oid);
 		return true;
 	}
 #endif
@@ -1039,14 +1055,20 @@ static bool snmp_session_set_auth_protocol(struct snmp_session *s, zend_string *
 
 	zend_value_error(
 		"Authentication protocol must be \"SHA\""
+#ifdef HAVE_SNMP_SHA224
+		", \"SHA224\""
+#endif
 #ifdef HAVE_SNMP_SHA256
-		" or \"SHA256\""
+		", \"SHA256\""
+#endif
+#ifdef HAVE_SNMP_SHA384
+		", \"SHA384\""
 #endif
 #ifdef HAVE_SNMP_SHA512
-		" or \"SHA512\""
+		", \"SHA512\""
 #endif
 #ifndef DISABLE_MD5
-		" or \"MD5\""
+		", or \"MD5\""
 #endif
 	);
 	return false;
@@ -1073,7 +1095,29 @@ static bool snmp_session_set_sec_protocol(struct snmp_session *s, zend_string *p
 	}
 #endif
 
-#ifdef HAVE_AES
+#ifdef HAVE_SNMP_AES192
+	if (zend_string_equals_literal_ci(prot, "AES192")) {
+		s->securityPrivProto = usmAES192PrivProtocol;
+		s->securityPrivProtoLen = sizeof(usmAES192PrivProtocol) / sizeof(oid);
+		return true;
+	}
+#endif
+
+#ifdef HAVE_SNMP_AES256
+	if (zend_string_equals_literal_ci(prot, "AES256")) {
+		s->securityPrivProto = usmAES256PrivProtocol;
+		s->securityPrivProtoLen = sizeof(usmAES256PrivProtocol) / sizeof(oid);
+		return true;
+	}
+#endif
+
+#if defined(HAVE_SNMP_AES256) && defined(HAVE_AES)
+# ifndef NETSNMP_DISABLE_DES
+	zend_value_error("Security protocol must be one of \"DES\", \"AES128\", \"AES\", \"AES192\", or \"AES256\"");
+# else
+	zend_value_error("Security protocol must be one of \"AES128\", \"AES\", \"AES192\", or \"AES256\"");
+# endif
+#elif defined(HAVE_AES)
 # ifndef NETSNMP_DISABLE_DES
 	zend_value_error("Security protocol must be one of \"DES\", \"AES128\", or \"AES\"");
 # else

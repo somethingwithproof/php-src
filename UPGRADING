@@ -164,6 +164,13 @@ PHP 8.6 UPGRADE NOTES
 - mysqli
   . Added new constant MYSQLI_OPT_COMPRESS.
 
+- SNMP:
+  . The auth_protocol parameter of snmp3_get(), snmp3_getnext(), snmp3_real_walk(),
+    snmp3_set(), snmp3_walk(), and SNMP::setSecurity() now accepts "SHA224" and
+    "SHA384" when linked against net-snmp >= 5.8 (RFC 7860).
+  . The priv_protocol parameter of the same functions now accepts "AES192" and
+    "AES256" when linked against net-snmp with Blumenthal AES support.
+
 ========================================
 10. New Global Constants
 ========================================
